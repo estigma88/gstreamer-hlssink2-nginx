@@ -14,6 +14,12 @@ Fragment name: (gchararray) "http://host.docker.internal:80/live/upload/segment_
 (gstreamer_hlssink2_nginx-2edcb8bdc60e9f14:5635): GStreamer-CRITICAL **: 19:57:40.083: gst_segment_to_running_time: assertion 'segment->format == format' failed
 ```
 
+# Requirements
+
+1. Ubuntu 22
+2. Gstreamer
+3. Rust
+
 # Running the test with Cargo
 
 Run `cargo test`

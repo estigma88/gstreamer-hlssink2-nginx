@@ -1,0 +1,18 @@
+{
+  "name": "gstreamer",
+  "image": "gstreamer-hlssink2-nginx",
+  "forwardPorts": [
+    8089
+  ],
+  "privileged": true,
+  "mounts": [
+    { "source": "/var/run/docker.sock", "target": "/var/run/docker.sock", "type": "bind" },
+  ],
+  containerEnv: {
+    "TEST_HOST": "host.docker.internal"
+  },
+  "runArgs": [
+    "--add-host=host.docker.internal:host-gateway",
+  ],
+  "workspaceFolder": "${localWorkspaceFolder}"
+}

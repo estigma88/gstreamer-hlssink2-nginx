@@ -5,12 +5,13 @@ edition = "2021"
 
 [dependencies]
 # gstreamer
-gst = { package = "gstreamer", version = "0.23.2" }
-gst-base = { package = "gstreamer-base", version = "0.23.2" }
-gst-audio = { package = "gstreamer-audio", version = "0.23.2" }
-gst-video = { package = "gstreamer-video", version = "0.23.2" }
+gst = { package = "gstreamer", version = "0.22.0", features = ["v1_22"]}
+gst-base = { package = "gstreamer-base", version = "0.22.0" , features = ["v1_22"]}
+gst-audio = { package = "gstreamer-audio", version = "0.22.0", features = ["v1_22"]}
+gst-video = { package = "gstreamer-video", version = "0.22.0", features = ["v1_22"]}
 gst-plugin-version-helper = { package = "gst-plugin-version-helper", version = "~0.8" }
-gst-check = { package = "gstreamer-check", version = "0.23.2" }
+gst-check = { package = "gstreamer-check", version = "0.22.0", features = ["v1_22"]}
+gio = { package = "gio", version = "0.19.8" }
 
 byte-slice-cast = { version = "1" }
 once_cell = { package = "once_cell", version = "1.18" }

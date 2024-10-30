@@ -37,7 +37,7 @@ pub(crate) mod test {
             .with_wait_for(WaitFor::seconds(5))
             .with_mapped_port(nginx_port, nginx_port.tcp())
             .with_host("host.docker.internal", Host::HostGateway)
-            .with_mount(Mount::bind_mount(absolute_path.to_str().unwrap(), "/etc/nginx/nginx.conf:ro"))
+            .with_mount(Mount::bind_mount(absolute_path.to_str().unwrap(), "/etc/nginx/nginx.conf"))
             .with_log_consumer(
                 LoggingConsumer::new()
                     .with_prefix("nginx -> ")

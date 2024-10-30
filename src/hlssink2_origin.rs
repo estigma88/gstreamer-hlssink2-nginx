@@ -192,6 +192,6 @@ pub(crate) mod test {
         tokio::time::sleep(Duration::from_secs(20)).await;
 
         // Stop the pipeline
-        pipeline.set_state(gst::State::Null).unwrap();
+        pipeline.set_state(gst::State::Null).expect("Couldn't stop pipeline");
     }
 }

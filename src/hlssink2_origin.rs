@@ -2,7 +2,8 @@ use testcontainers::core::IntoContainerPort;
 
 #[cfg(test)]
 pub(crate) mod test {
-    use std::env;
+    use std::{env, fs};
+    use std::path::{Path, PathBuf};
     use log::Level;
     use gst::Pipeline;
     use gst::prelude::{Cast, ElementExt};
@@ -18,14 +19,16 @@ pub(crate) mod test {
         env::set_var("RUST_LOG", "DEBUG");
         env_logger::init();
 
+        let relative_path = Path::new("nginx.conf");
+        let absolute_path = fs::canonicalize(&relative_path).unwrap();
+
         let container = GenericImage::new(
             "nginx",
             "1.27.2",
         )
             .with_wait_for(WaitFor::seconds(5))
             .with_mapped_port(80, 80.tcp())
-            .with_host("host.docker.internal", HostGateway)
-            .with_mount(Mount::volume_mount("nginx.con", "/etc/nginx/nginx.conf:ro"))
+            .with_mount(Mount::bind_mount(absolute_path.to_str().unwrap(), "/etc/nginx/nginx.conf:ro"))
             .with_log_consumer(
                 LoggingConsumer::new()
                     .with_prefix("nginx -> ")

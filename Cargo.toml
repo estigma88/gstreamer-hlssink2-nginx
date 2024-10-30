@@ -1,0 +1,26 @@
+[package]
+name = "gstreamer-hlssink2-nginx"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# gstreamer
+gst = { package = "gstreamer", version = "0.23.2" }
+gst-base = { package = "gstreamer-base", version = "0.23.2" }
+gst-audio = { package = "gstreamer-audio", version = "0.23.2" }
+gst-video = { package = "gstreamer-video", version = "0.23.2" }
+gst-plugin-version-helper = { package = "gst-plugin-version-helper", version = "~0.8" }
+gst-check = { package = "gstreamer-check", version = "0.23.2" }
+
+byte-slice-cast = { version = "1" }
+once_cell = { package = "once_cell", version = "1.18" }
+
+tokio = { version = "1", features = ["full"] }
+tokio-openssl = { version = "0.6" }
+openssl = { version = "0.10" }
+reqwest = { version = "0.12", features = ["json"] }
+
+# test
+testcontainers = { version = "0.23.1", features = ["blocking", "watchdog", "http_wait"] }
+env_logger = "0.11.5"
+log = "0.4.22"

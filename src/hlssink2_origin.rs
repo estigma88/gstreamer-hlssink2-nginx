@@ -24,8 +24,11 @@ pub(crate) mod test {
         env::set_var("RUST_LOG", "DEBUG");
         env_logger::init();
 
-        let relative_path = Path::new("nginx.conf");
-        let absolute_path = fs::canonicalize(&relative_path).unwrap();
+        let config_relative_path = Path::new("nginx.conf");
+        let config_absolute_path = fs::canonicalize(&config_relative_path).unwrap();
+        
+        let logs_relative_path = Path::new("target/logs");
+        let logs_absolute_path = fs::canonicalize(&logs_relative_path).unwrap();
 
         let nginx_port = 80;
         let nginx_host = env::var("TEST_HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
@@ -37,7 +40,8 @@ pub(crate) mod test {
             .with_wait_for(WaitFor::seconds(5))
             .with_mapped_port(nginx_port, nginx_port.tcp())
             .with_host("host.docker.internal", Host::HostGateway)
-            .with_mount(Mount::bind_mount(absolute_path.to_str().unwrap(), "/etc/nginx/nginx.conf"))
+            .with_mount(Mount::bind_mount(config_absolute_path.to_str().unwrap(), "/etc/nginx/nginx.conf"))
+            .with_mount(Mount::bind_mount(logs_absolute_path.to_str().unwrap(), "/var/log/nginx"))
             .with_log_consumer(
                 LoggingConsumer::new()
                     .with_prefix("nginx -> ")
@@ -103,8 +107,8 @@ pub(crate) mod test {
 
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
                 let value = output_stream.to_value();
@@ -139,8 +143,8 @@ pub(crate) mod test {
 
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
                 let value = output_stream.to_value();
@@ -175,8 +179,8 @@ pub(crate) mod test {
 
                 output_stream.write(format!("DELETE {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
                 let value = output_stream.to_value();

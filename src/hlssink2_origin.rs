@@ -86,6 +86,8 @@ pub(crate) mod test {
             .by_name("sink")
             .expect("Could not find hlssink2 element named 'sink'");
 
+        
+        
         hlssink2.connect("get-playlist-stream", false, move |values| {
             if let Some(playlist) = values.get(1) {
                 println!("Playlist created: {:?}", playlist);

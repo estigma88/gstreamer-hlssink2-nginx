@@ -22,6 +22,8 @@ mod imp {
     use gio::prelude::OutputStreamExtManual;
     use gio::subclass::prelude::{ObjectImpl, ObjectSubclass, OutputStreamImpl};
 
+    
+    
     pub struct ChunkedOutputStream {
         pub(crate) inner: RefCell<gio::OutputStream>,
     }

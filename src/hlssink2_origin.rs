@@ -24,7 +24,7 @@ pub(crate) mod test {
 
     #[tokio::test]
     async fn pipeline_hlssink_nginx() {
-        env::set_var("RUST_LOG", "DEBUG");
+        env::set_var("RUST_LOG", "DEBUG");  
         env_logger::init();
 
         let config_relative_path = Path::new("nginx.conf");

@@ -3,6 +3,8 @@ use testcontainers::core::IntoContainerPort;
 #[cfg(test)]
 pub(crate) mod test {
     use std::{env, fs};
+    use std::io::{Bytes, Empty};
+    use std::net::TcpStream;
     use std::path::{Path, PathBuf};
     use std::time::Duration;
     use gio::{Cancellable, File, FileCreateFlags, OutputStream, SocketClient};
@@ -11,6 +13,7 @@ pub(crate) mod test {
     use gst::Pipeline;
     use gst::prelude::{Cast, ElementExt, GstBinExt, ObjectExt};
     use gst::State::{Null, Playing};
+    use hyper::Request;
     use log::Level;
     use reqwest::Url;
     use testcontainers::core::{Host, Mount, WaitFor};
@@ -163,6 +166,11 @@ pub(crate) mod test {
 
                 let client = SocketClient::new();
 
+                client.connect_to_uri(
+                    parsed_url.host_str().unwrap(),
+                    parsed_url.port().unwrap_or(nginx_port),
+                    None::<&Cancellable>
+                );
                 // Connect to the server
                 let connection = client
                     .connect_to_host(

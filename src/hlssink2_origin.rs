@@ -20,6 +20,7 @@ pub(crate) mod test {
     use testcontainers::{GenericImage, ImageExt};
     use testcontainers::core::logs::consumer::logging_consumer::LoggingConsumer;
     use testcontainers::runners::AsyncRunner;
+    use crate::chunked_output_stream::ChunkedOutputStream;
     use super::*;
 
     #[tokio::test]
@@ -112,11 +113,11 @@ pub(crate) mod test {
 
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
                 // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
-                let value = output_stream.to_value();
+                let value = ChunkedOutputStream::new(output_stream).to_value();
 
                 return Some(value);
             }
@@ -148,11 +149,11 @@ pub(crate) mod test {
 
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
                 // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
-                let value = output_stream.to_value();
+                let value = ChunkedOutputStream::new(output_stream).to_value();
 
                 return Some(value);
             }
@@ -189,7 +190,7 @@ pub(crate) mod test {
 
                 output_stream.write(format!("DELETE {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
-                // output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
+                output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
                 // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 

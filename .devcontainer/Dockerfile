@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 # Environment variable to configure timezone
 ENV TZ=Etc/UTC \
     FFMPEG_VERSION=5.1 \
-    GSTREAMER_VERSION=1.24.2
+    GSTREAMER_VERSION=1.24.9
 
 WORKDIR /tmp/workdir
 

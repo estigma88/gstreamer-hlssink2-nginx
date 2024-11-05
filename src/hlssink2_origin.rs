@@ -150,7 +150,7 @@ pub(crate) mod test {
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
-                // output_stream.write("Connection: close\n".as_bytes(), None::<&Cancellable>).unwrap();
+                output_stream.write("Connection: keep-alive\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
 
                 let value = ChunkedOutputStream::new(output_stream).to_value();

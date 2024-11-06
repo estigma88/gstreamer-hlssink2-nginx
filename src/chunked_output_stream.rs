@@ -58,6 +58,7 @@ mod imp {
             if let Some(ref mut stream) = *self.inner.borrow_mut() {
                 // Write the final chunk (0) to signal end of stream
                 stream.write_all(b"0\r\n\r\n", None::<&Cancellable>).unwrap();
+                stream.close(None::<&Cancellable>).unwrap();
 
                 Ok(())
             } else {

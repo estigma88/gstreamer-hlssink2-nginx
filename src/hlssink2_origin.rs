@@ -6,6 +6,7 @@ pub(crate) mod test {
     use std::io::{Bytes, Empty};
     use std::net::TcpStream;
     use std::path::{Path, PathBuf};
+    use std::sync::{Arc, Mutex};
     use std::time::Duration;
     use gio::{Cancellable, File, FileCreateFlags, OutputStream, SocketClient};
     use gio::glib::Value;
@@ -132,7 +133,7 @@ pub(crate) mod test {
                 let parsed_url = Url::parse(&*fragment.get::<String>().unwrap()).unwrap();
 
                 let client = SocketClient::new();
-
+                
                 // Connect to the server
                 let connection = client
                     .connect_to_host(
@@ -144,16 +145,19 @@ pub(crate) mod test {
                         None::<&Cancellable>
                     )
                     .expect("Failed to connect to socket");
-
+                
                 let output_stream = connection.output_stream();
-
+                
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
-                output_stream.write("Connection: keep-alive\n".as_bytes(), None::<&Cancellable>).unwrap();
+                // output_stream.write("Connection: keep-alive\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
+                
+                output_stream.flush(None::<&Cancellable>).unwrap();
 
                 let value = ChunkedOutputStream::new(output_stream).to_value();
+                // let value = output_stream.to_value();
 
                 return Some(value);
             }
@@ -168,12 +172,7 @@ pub(crate) mod test {
                 let parsed_url = Url::parse(&*fragment.get::<String>().unwrap()).unwrap();
 
                 let client = SocketClient::new();
-
-                client.connect_to_uri(
-                    parsed_url.host_str().unwrap(),
-                    parsed_url.port().unwrap_or(nginx_port),
-                    None::<&Cancellable>
-                );
+                
                 // Connect to the server
                 let connection = client
                     .connect_to_host(

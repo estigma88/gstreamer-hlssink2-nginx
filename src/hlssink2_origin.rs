@@ -3,12 +3,14 @@ use testcontainers::core::IntoContainerPort;
 #[cfg(test)]
 pub(crate) mod test {
     use std::{env, fs};
+    use std::cell::RefCell;
     use std::io::{Bytes, Empty};
     use std::net::TcpStream;
     use std::path::{Path, PathBuf};
+    use std::rc::Rc;
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
-    use gio::{Cancellable, File, FileCreateFlags, OutputStream, SocketClient};
+    use gio::{Cancellable, File, FileCreateFlags, OutputStream, SocketClient, SocketConnection, TcpConnection, WriteOutputStream};
     use gio::glib::Value;
     use gio::prelude::{ApplicationExt, FileExt, IOStreamExt, OutputStreamExt, SocketClientExt, SocketConnectableExt, ToValue};
     use gst::Pipeline;
@@ -95,22 +97,15 @@ pub(crate) mod test {
                 println!("Playlist created: {:?}", playlist);
 
                 let parsed_url = Url::parse(&*playlist.get::<String>().unwrap()).unwrap();
+                
+                let stream = TcpStream::connect(
+                    format!("{}:{}",
+                            parsed_url.host_str().unwrap(),
+                            parsed_url.port().unwrap_or(nginx_port)
+                    ).as_str()
+                ).unwrap();
 
-                let client = SocketClient::new();
-
-                // Connect to the server
-                let connection = client
-                    .connect_to_host(
-                        format!("{}:{}",
-                                parsed_url.host_str().unwrap(),
-                                parsed_url.port().unwrap_or(nginx_port)
-                        ).as_str(),
-                        parsed_url.port().unwrap_or(nginx_port),
-                        None::<&Cancellable>
-                    )
-                    .expect("Failed to connect to socket");
-
-                let output_stream = connection.output_stream();
+                let output_stream: OutputStream = gio::OutputStream::from(gio::WriteOutputStream::new(stream));
 
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
@@ -125,6 +120,12 @@ pub(crate) mod test {
             None
         });
 
+        // Create a reference-counted pointer to a mutable container (RefCell)
+        let shared_data: Arc<Mutex<Option<TcpStream>>> = Arc::new(Mutex::new(None));
+
+        // Clone the Rc to share ownership with the closure
+        let data_clone = Arc::clone(&shared_data);
+
         hlssink2.connect("get-fragment-stream", false, move |values| {
             println!("Callback values: {:?}", values);
             if let Some(fragment) = values.get(1) {
@@ -132,32 +133,24 @@ pub(crate) mod test {
 
                 let parsed_url = Url::parse(&*fragment.get::<String>().unwrap()).unwrap();
 
-                let client = SocketClient::new();
-                
-                // Connect to the server
-                let connection = client
-                    .connect_to_host(
-                        format!("{}:{}",
-                                parsed_url.host_str().unwrap(),
-                                parsed_url.port().unwrap_or(nginx_port)
-                        ).as_str(),
-                        parsed_url.port().unwrap_or(nginx_port),
-                        None::<&Cancellable>
-                    )
-                    .expect("Failed to connect to socket");
-                
-                let output_stream = connection.output_stream();
-                
+                let stream = TcpStream::connect(
+                    format!("{}:{}",
+                            parsed_url.host_str().unwrap(),
+                            parsed_url.port().unwrap_or(nginx_port)
+                    ).as_str()
+                ).unwrap();
+
+                let output_stream: OutputStream = gio::OutputStream::from(gio::WriteOutputStream::new(stream));
+
                 output_stream.write(format!("PUT {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Transfer-Encoding: chunked\n".as_bytes(), None::<&Cancellable>).unwrap();
                 // output_stream.write("Connection: keep-alive\n".as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("\r\n".as_bytes(), None::<&Cancellable>).unwrap();
-                
+
                 output_stream.flush(None::<&Cancellable>).unwrap();
 
                 let value = ChunkedOutputStream::new(output_stream).to_value();
-                // let value = output_stream.to_value();
 
                 return Some(value);
             }
@@ -170,22 +163,15 @@ pub(crate) mod test {
                 println!("Fragment removed: {:?}", fragment);
 
                 let parsed_url = Url::parse(&*fragment.get::<String>().unwrap()).unwrap();
-
-                let client = SocketClient::new();
                 
-                // Connect to the server
-                let connection = client
-                    .connect_to_host(
-                        format!("{}:{}",
-                                parsed_url.host_str().unwrap(),
-                                parsed_url.port().unwrap_or(nginx_port)
-                        ).as_str(),
-                        parsed_url.port().unwrap_or(nginx_port),
-                        None::<&Cancellable>
-                    )
-                    .expect("Failed to connect to socket");
+                let stream = TcpStream::connect(
+                    format!("{}:{}",
+                            parsed_url.host_str().unwrap(),
+                            parsed_url.port().unwrap_or(nginx_port)
+                    ).as_str()
+                ).unwrap();
 
-                let output_stream = connection.output_stream();
+                let output_stream: OutputStream = gio::OutputStream::from(gio::WriteOutputStream::new(stream));
 
                 output_stream.write(format!("DELETE {} HTTP/1.1\n", parsed_url.path()).as_bytes(), None::<&Cancellable>).unwrap();
                 output_stream.write("Host: localhost\n".as_bytes(), None::<&Cancellable>).unwrap();
@@ -195,7 +181,7 @@ pub(crate) mod test {
 
                 let value = output_stream.to_value();
 
-                return Some(value);
+                return None;
             }
             None
         });

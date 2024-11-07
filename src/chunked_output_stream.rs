@@ -1,14 +1,7 @@
-use gio::glib::value::{FromValue, FromValueOptional, ToValueOptional};
-use gio::glib::Error;
 use gio::prelude::*;
-use gio::subclass::prelude::OutputStreamImpl;
 use gio::{glib, Cancellable, OutputStream};
 use glib::subclass::prelude::*;
 use glib::translate::*;
-use std::borrow::Borrow;
-use std::fmt::Debug;
-use std::hash::{Hash, Hasher};
-use std::io::Write;
 
 mod imp {
     use super::*;

@@ -3,17 +3,6 @@
 This is an example of using hlssink2 and its signals to push the playlist and fragments to an origin, using HTTP. In
 this case, the origin is nginx.
 
-The following are the errors/warnings we see:
-
-```
-Callback values: [(GstHlsSink2) (GstHlsSink2) sink, (gchararray) "http://host.docker.internal:80/live/upload/segment_00000.ts"]
-Fragment name: (gchararray) "http://host.docker.internal:80/live/upload/segment_00000.ts"
-
-(gstreamer_hlssink2_nginx-2edcb8bdc60e9f14:5635): GStreamer-WARNING **: 19:57:40.083: ../subprojects/gstreamer/gst/gstpad.c:4463:gst_pad_chain_data_unchecked:<mpegtsmux0:sink_65> Got data flow before segment event
-
-(gstreamer_hlssink2_nginx-2edcb8bdc60e9f14:5635): GStreamer-CRITICAL **: 19:57:40.083: gst_segment_to_running_time: assertion 'segment->format == format' failed
-```
-
 # Requirements
 
 1. Ubuntu 22
